@@ -1,0 +1,11 @@
+select CustomerID,EmployeeID,OrderDate,RequiredDate,ShippedDate,ShipVia,
+Freight,ShipName, ShipAddress,ShipCity,ShipRegion, ShipPostalCode, ShipCountry,CreditCard into orders_op
+from Orders where OrderID>0
+
+
+insert into Orders (CustomerID,EmployeeID,OrderDate,RequiredDate,ShippedDate,ShipVia,
+Freight,ShipName, ShipAddress,ShipCity,ShipRegion, ShipPostalCode, ShipCountry,CreditCard)
+select * from orders_op--Run five times
+
+UPDATE Orderdetailcp
+SET    OrderID = abs(checksum(NewId()) % 666462)--Generate new coluumID with random number--Run five times

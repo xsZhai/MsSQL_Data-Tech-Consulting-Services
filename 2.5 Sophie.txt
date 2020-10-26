@@ -1,0 +1,21 @@
+alter table [Order Details]
+add SellPrice money
+
+update [Order Details]
+set SellPrice= UnitPrice*Quantity*(1-Discount)
+go
+
+alter table Orders
+add TotalPrice money
+go
+
+select OrderID, sum(SellPrice) 'TP' into Priceupdate
+from [Order Details]
+Group by OrderID
+go
+
+update Orders
+set TotalPrice= t.TP 
+from Orders p inner join Priceupdate t
+on p.OrderID=t.OrderID
+go

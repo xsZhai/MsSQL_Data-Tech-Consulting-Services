@@ -1,0 +1,32 @@
+select EmployeeID, Sum(Totalsales) 'Annual Sales 1997' into #tempt1 from KPItest
+where orderdate between '1997-01-01' and '1997-12-31'
+Group by EmployeeID
+go
+
+select EmployeeID, Sum(Totalsales) 'Annual Sales 1998' into #tempt2 from KPItest
+where orderdate between '1998-01-01' and '1998-12-31'
+Group by EmployeeID
+go
+
+select distinct EmployeeID into #tempt3 from KPItest
+
+alter table #tempt3
+add [Annual Sales 1997] float, [Annual Sales 1998] float, Growth float
+go
+
+update #tempt3
+set [Annual Sales 1997] = b.[Annual Sales 1997]
+from #tempt3 a inner join #tempt1 b
+on a.EmployeeID = b.EmployeeID
+go
+
+update #tempt3
+set [Annual Sales 1998] = b.[Annual Sales 1998]
+from #tempt3 a inner join #tempt2 b
+on a.EmployeeID = b.EmployeeID
+go
+
+update #tempt3
+set Growth=Convert(decimal(20,2),([Annual Sales 1998]-[Annual Sales 1997])/[Annual Sales 1997])
+
+select*from #tempt3

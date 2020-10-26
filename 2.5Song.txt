@@ -1,0 +1,17 @@
+alter table Customers
+add Creditcard nvarchar(16)
+go
+
+UPDATE Customers
+SET Creditcard = Left(abs(checksum(NewId()) % 899999999)+100000000,9) +RIGHT(abs(checksum(NewId()) % 8999999)+1000000,7)
+go
+
+update Orders
+
+set CreditCard= t.CreditCard
+
+from Orders p inner join Customers t
+
+on p.CustomerID = t.CustomerID
+
+go

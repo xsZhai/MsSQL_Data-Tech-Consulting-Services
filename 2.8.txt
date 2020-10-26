@@ -1,0 +1,14 @@
+create procedure ope_nrowset  @t nvarchar(300)= 'Microsoft.ACE.OLEDB.12.0',@t2 nvarchar(300)='Excel 12.0;HDR=Yes;IMEX=1;',
+@t3 nvarchar(3000)= 'Database=C:\test.xlsx', @t4 nvarchar(3000)='[sheet1$]'
+as
+declare @sql nvarchar(3000)
+
+
+set  @sql= 'select' + '*' + 'from' +  ' ' + 'OpenRowSet' + '(' + '''' + @t + '''' + ','
++ '''' + @t2 + @t3 +'''' + ',' + @t4 + ')'
+print @sql
+exec (@sql)
+go
+
+exec  ope_nrowset
+drop procedure ope_nrowset

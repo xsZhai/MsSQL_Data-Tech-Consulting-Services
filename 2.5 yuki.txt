@@ -1,0 +1,59 @@
+--only use [orders] & [order details 2]
+select*from [Order Details 2]
+select*from [products]
+select*from [categories]
+select*from [orders]
+
+INSERT INTO [orders]  
+  (CustomerID, employeeid,orderdate, RequiredDate, shippeddate,shipvia,freight, shipname, shipaddress, shipcity,shipregion,shippostalcode, shipcountry,creditcard)
+  select customerid, employeeid, orderdate, RequiredDate, shippeddate,shipvia,freight, shipname, shipaddress, shipcity,shipregion,shippostalcode, shipcountry,creditcard
+   FROM [orders 2]--enlarge orders 10 times
+
+INSERT INTO [order details 2]  
+    SELECT orderid, ProductID, UnitPrice, Quantity, Discount   
+    FROM [Orders]..[order details]  --enlarge order details 10 times
+
+update [Order Details 2]set orderid = abs (checksum(newid())%1221847) --update orderid
+
+---add more table refrencing
+
+update Orders set OrderDate=dateadd(year,+20,orderdate),
+RequiredDate=DATEADD (year, +20,RequiredDate),
+ShippedDate=DATEADD (year, +20, shippeddate) where OrderID > 111077 -- change the date to the most recent 20 years for order id >111077
+
+alter table [order details 2] add CategoryID char(50)--to add column ctgID in  [order details 2]
+
+alter table [order details 2] drop CategoryID--to drop column ctgID, cannot drop constraint
+if exists (select * from sysobjects where name = 'categoryID') 
+alter table [order details 2] drop constraint CategoryID  -- to drop column ctgID in [order details 2] -constraint, successed
+
+alter table [order details 2] add foreign key (ProductID) references products (productid) --add FK productID in order details 2
+
+insert into [Order Details 2] (CategoryID)
+select CategoryID from Products
+where [Order Details 2].ProductID = Products.ProductID
+--insert category id in order details where product id is the same --error msg 4104??????
+
+--try another way by using add column ctgID and update ID info by using inner join
+alter table [order details 2] add CategoryID char(50)--to add column ctgID in  [order details 2]
+update [order details 2] 
+set CategoryID=Products.CategoryID
+from [Order Details 2]inner join Products on [Order Details 2].ProductID = Products.ProductID --insert ctgID
+
+insert into [products](CategoryName)
+select CategoryName
+ from [Categories]
+ where [Products].CategoryID=Categories.CategoryID
+ --insert category name in products where categoryid is the same ??????--error msg 4104
+
+--try another way by using add column ctgName and update name info by using inner join
+ alter table [products] add CategoryName char(50)--to add column ctgName in  [products]
+update [products] 
+set CategoryName=Categories.CategoryName
+from [Products]inner join Categories on [Products].CategoryID=Categories.CategoryID --insert ctgName in products
+
+--to insert category Name in [orderdetails 2]
+alter table [order details 2] add CategoryName char(50)--to add column ctgName in  [order details 2]
+update [order details 2] 
+set CategoryName=Categories.CategoryName
+from [Order Details 2]inner join Categories on [Order Details 2].CategoryID = Categories.CategoryID --insert ctgName in [order details 2]

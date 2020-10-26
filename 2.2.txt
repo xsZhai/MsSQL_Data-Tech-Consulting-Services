@@ -1,0 +1,5 @@
+update Orders
+set OrderDate= DATEADD(year, +20, OrderDate),
+ RequiredDate=DATEADD(year, +20, RequiredDate),
+ ShippedDate=DATEADD(year, +20, ShippedDate)
+ where OrderID>111077
